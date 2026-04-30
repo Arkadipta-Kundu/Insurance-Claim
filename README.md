@@ -89,6 +89,7 @@ Database
 JWT secures all protected routes.
 
 🛡️ Security Measures
+
 Password encryption
 JWT authentication
 Role-based access control (if implemented)
@@ -98,6 +99,7 @@ Secure file upload validation
 📊 Admin dashboard with analytics
 🌐 Deployment on cloud (AWS / Azure)
 🤖 AI-based fraud detection
+
 👩‍💻 Author
 
 Ambapali Datta
