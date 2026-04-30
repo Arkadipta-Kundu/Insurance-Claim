@@ -1,111 +1,204 @@
-🛡️ Insurance Claim Verification System
+# 🛡️ Insurance Claim Verification System
 
-A Full-Stack Insurance Claim Verification System built using React (Frontend) and Spring Boot (Backend) that enables secure claim submission, biometric-based identity verification, document upload, and automated certificate generation.
+<p align="center">
+  <b>A Secure Full-Stack Insurance Claim Management & Verification Platform</b><br>
+  Built with React & Spring Boot
+</p>
 
-🚀 Project Overview
+---
 
-This application is designed to streamline and secure the insurance claim process. It ensures:
+## 📌 Problem Statement
 
-🔐 Secure authentication using JWT
-👤 Biometric enrollment for user identity verification
-📄 Secure document upload for claims
-🧾 Automated certificate generation
-🧠 Backend validation and verification logic
-💻 Modern responsive frontend UI
+Insurance claim processes are often slow, manual, and vulnerable to fraud. This system aims to digitize and secure the claim workflow using authentication, document verification, and biometric identity validation.
 
-The goal of this system is to reduce fraud, improve verification speed, and provide a seamless claim experience.
+---
 
-🏗️ Tech Stack
-🎨 Frontend
-React.js
-HTML5
-CSS3
-JavaScript
-Axios (for API calls)
-⚙️ Backend
-Spring Boot
-Java
-REST APIs
-JWT Authentication
-Maven
-🗄️ Database
-(Mention your database here, e.g., MySQL / PostgreSQL / H2)
-📂 Project Structure
+## 🚀 Project Overview
+
+The **Insurance Claim Verification System** is a full-stack web application that enables users to securely submit insurance claims while ensuring identity validation and backend verification.
+
+### 🎯 Core Objectives
+
+* Reduce fraudulent claims
+* Automate verification workflows
+* Improve claim processing efficiency
+* Ensure secure authentication & authorization
+
+---
+
+## 🏗️ Tech Stack
+
+### 🎨 Frontend
+
+* React.js
+* HTML5
+* CSS3
+* JavaScript (ES6+)
+* Axios (API integration)
+
+### ⚙️ Backend
+
+* Spring Boot
+* Java
+* RESTful APIs
+* JWT Authentication
+* Maven
+
+### 🗄️ Database
+
+* (Add your database here: MySQL / PostgreSQL / H2)
+
+---
+
+## 📂 Project Structure
+
+```
 Insurance-Claim/
 │
-├── frontend/                # React Application
+├── frontend/                    # React Application
 │
-├── backend/insurance-backend/   # Spring Boot Application
+├── backend/
+│   └── insurance-backend/       # Spring Boot Application
 │
 └── README.md
-✨ Features
-✅ User Registration & Login
-🔐 JWT-based Authentication & Authorization
-👤 Biometric Enrollment System
-📤 Secure Claim Document Upload
-📑 Claim Status Tracking
-🧾 Automated Verification Certificate Generation
-🛡️ Backend Validation & Secure APIs
-🔧 Installation & Setup
-1️⃣ Clone the Repository
+```
+
+---
+
+## ✨ Key Features
+
+* ✅ User Registration & Secure Login
+* 🔐 JWT-Based Authentication & Authorization
+* 👤 Biometric Enrollment & Identity Verification
+* 📤 Secure Insurance Claim Submission
+* 📄 Document Upload & Validation
+* 📑 Claim Status Tracking
+* 🧾 Automated Certificate Generation
+* 🛡️ Backend Input Validation & Secure APIs
+
+---
+
+## 🔄 Application Flow
+
+1. User registers and logs in.
+2. Backend authenticates user and generates a JWT token.
+3. Token is stored on the client side.
+4. Protected API requests include JWT in the Authorization header.
+5. Backend validates token before processing.
+6. Claims are verified and certificate is generated.
+
+---
+
+## 🧠 System Architecture
+
+```
+Frontend (React)
+        ↓
+   REST API Calls
+        ↓
+Backend (Spring Boot)
+        ↓
+     Database
+```
+
+JWT secures all protected endpoints.
+
+---
+
+## 🔧 Installation & Setup
+
+### 1️⃣ Clone Repository
+
+```bash
 git clone https://github.com/ambapalidatta/Insurance-Claim.git
 cd Insurance-Claim
-2️⃣ Backend Setup (Spring Boot)
+```
+
+---
+
+### 2️⃣ Backend Setup (Spring Boot)
+
+```bash
 cd backend/insurance-backend
-Configure application.properties with your database credentials.
+```
+
+* Configure `application.properties` with database credentials.
+
 Build the project:
+
+```bash
 mvn clean install
-Run the application:
+```
+
+Run the backend:
+
+```bash
 mvn spring-boot:run
+```
 
-Backend will run on:
+Backend runs on:
 
+```
 http://localhost:8080
-3️⃣ Frontend Setup (React)
+```
+
+---
+
+### 3️⃣ Frontend Setup (React)
+
+```bash
 cd frontend
 npm install
 npm start
+```
 
-Frontend will run on:
+Frontend runs on:
 
+```
 http://localhost:3000
-🔐 Authentication Flow
-User registers and logs in.
-Backend generates a JWT token.
-Token is stored on the client side.
-All protected API calls include the JWT in headers.
-Backend validates token before processing requests.
-📸 Screenshots
+```
 
+---
 
-🧠 System Architecture (High-Level)
+## 🔐 Security Measures
 
-Frontend (React)
-⬇ REST API Calls
-Backend (Spring Boot)
-⬇
-Database
+* Password encryption
+* JWT-based authentication
+* Secure file upload validation
+* Role-based access control (if implemented)
 
-JWT secures all protected routes.
+---
 
-🛡️ Security Measures
+## 📸 Screenshots
 
-Password encryption
-JWT authentication
-Role-based access control (if implemented)
-Secure file upload validation
-📌 Future Improvements
-🔔 Email notifications for claim updates
-📊 Admin dashboard with analytics
-🌐 Deployment on cloud (AWS / Azure)
-🤖 AI-based fraud detection
+(Add application screenshots here for better visualization)
 
-👩‍💻 Author
+```
+/screenshots/login.png
+/screenshots/dashboard.png
+```
 
-Ambapali Datta
+---
+
+## 📌 Future Enhancements
+
+* 🔔 Email notifications for claim updates
+* 📊 Admin analytics dashboard
+* 🌐 Cloud deployment (AWS / Azure)
+* 🤖 AI-based fraud detection system
+
+---
+
+## 👩‍💻 Author
+
+**Ambapali Datta**
 BTech Computer Science Student
-Passionate about Full-Stack Development & Secure Systems
+Full-Stack Development Enthusiast
 
-⭐ If You Like This Project
+---
 
-Give it a star ⭐ and feel free to fork and improve!
+## ⭐ Support
+
+If you found this project useful, consider giving it a ⭐ on GitHub.
+
+Contributions and suggestions are welcome!
