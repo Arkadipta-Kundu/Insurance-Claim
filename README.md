@@ -77,12 +77,8 @@ All protected API calls include the JWT in headers.
 Backend validates token before processing requests.
 📸 Screenshots
 
-(Add screenshots here for better presentation)
 
-Example:
 
-![Login Page](screenshots/login.png)
-![Dashboard](screenshots/dashboard.png)
 🧠 System Architecture (High-Level)
 
 Frontend (React)
