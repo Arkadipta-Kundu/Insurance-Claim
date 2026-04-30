@@ -1,0 +1,36 @@
+/* src/index.css */
+@import "tailwindcss";
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply antialiased;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.8s ease-out;
+}
+
+@layer utilities {
+  .bg-grid-white\/10 {
+    background-image:
+      linear-gradient(to right, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+}

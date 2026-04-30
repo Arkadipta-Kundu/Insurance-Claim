@@ -1,0 +1,139 @@
+// frontend/src/lib/api.js
+const BASE = import.meta.env.VITE_API_BASE || "http://localhost:8080";
+
+async function request(path, options = {}) {
+  const headers = options.headers || {};
+
+  const res = await fetch(`${BASE}${path}`, {
+    ...options,
+    headers,
+  });
+
+  const contentType = res.headers.get("content-type");
+
+  let data;
+  if (contentType?.includes("application/json")) {
+    data = await res.json();
+  } else if (contentType?.includes("application/octet-stream")) {
+    data = await res.blob();
+  } else {
+    data = await res.text();
+  }
+
+  if (!res.ok) {
+    const msg =
+      typeof data === "string" ? data : data?.message || "Request failed";
+    throw new Error(msg);
+  }
+
+  return data;
+}
+
+export const api = {
+  sendOtp: (email) =>
+    request("/api/auth/send-otp", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    }),
+
+  verifyOtp: (email, otp) =>
+    request("/api/auth/verify-otp", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, otp }),
+    }),
+
+  register: (payload) =>
+    request("/api/auth/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    }),
+
+  login: (email, password) =>
+    request("/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    }),
+
+  createClaim: (token) =>
+    request("/api/claims", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    }),
+
+  uploadDoc: async (token, claimId, docType, file) => {
+    const fd = new FormData();
+    fd.append("file", file);
+
+    const res = await fetch(`${BASE}/api/claims/${claimId}/docs/${docType}`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+      body: fd,
+    });
+
+    if (!res.ok) {
+      const error = await res.text();
+      throw new Error(error || "Upload failed");
+    }
+
+    return await res.json();
+  },
+
+  downloadDoc: async (token, claimId, docType) => {
+    const res = await fetch(`${BASE}/api/claims/${claimId}/docs/${docType}`, {
+      method: "GET",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (!res.ok) {
+      throw new Error("Download failed");
+    }
+
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = docType;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    window.URL.revokeObjectURL(url);
+    return { success: true };
+  },
+
+  verifyBiometric: (token, claimId, who, biometricToken) =>
+    request(`/api/claims/${claimId}/biometric/${who}`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ biometricToken }),
+    }),
+
+  submitClaim: (token, claimId) =>
+    request(`/api/claims/${claimId}/submit`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+    }),
+
+  getCertificate: (token, claimId) =>
+    request(`/api/claims/${claimId}/certificate`, {
+      method: "GET",
+      headers: { Authorization: `Bearer ${token}` },
+    }),
+
+  processImages: (token, claimId) =>
+    request(`/api/claims/${claimId}/process-images`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+    }),
+};
