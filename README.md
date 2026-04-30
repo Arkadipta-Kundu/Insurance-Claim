@@ -78,7 +78,6 @@ Backend validates token before processing requests.
 📸 Screenshots
 
 
-
 🧠 System Architecture (High-Level)
 
 Frontend (React)
