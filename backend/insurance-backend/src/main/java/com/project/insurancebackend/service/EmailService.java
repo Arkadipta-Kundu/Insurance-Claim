@@ -9,10 +9,18 @@ import org.springframework.stereotype.Service;
 @Service
 public class EmailService {
 
-    @Autowired
+    @Autowired(required = false)
     private JavaMailSender mailSender;
 
+    private boolean isMailConfigured() {
+        return mailSender != null;
+    }
+
     public void sendOtpEmail(String to, String otp) {
+        if (!isMailConfigured()) {
+            System.out.println("⚠️ Mail sender is not configured. Skipping OTP email for: " + to);
+            return;
+        }
         try {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setTo(to);
@@ -40,6 +48,10 @@ public class EmailService {
     }
 
     public void sendWelcomeEmail(String to, String name) {
+        if (!isMailConfigured()) {
+            System.out.println("⚠️ Mail sender is not configured. Skipping welcome email for: " + to);
+            return;
+        }
         try {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setTo(to);

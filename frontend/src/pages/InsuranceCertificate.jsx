@@ -2,9 +2,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { api } from "../lib/api";
 
 const InsuranceCertificate = () => {
-  const { user } = useAuth();
+  const { token } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [certificate, setCertificate] = useState(null);
@@ -29,61 +30,29 @@ const InsuranceCertificate = () => {
     }
   }, [location.state]);
 
-  const handleDownload = () => {
-    // Create certificate content for download
-    const certificateContent = `
-      ================================================
-              INSURANCE CERTIFICATE
-      ================================================
-      
-      Certificate ID: ${certificate.certificateId}
-      Policy Number: ${certificate.policyNumber}
-      
-      Policy Holder Information:
-      -------------------------
-      Name: ${certificate.holderName}
-      Email: ${certificate.holderEmail}
-      Phone: ${certificate.holderPhone || "Not provided"}
-      
-      Nominee Information:
-      -------------------
-      Name: ${certificate.nomineeName}
-      Relation: ${certificate.nomineeRelation}
-      
-      Policy Details:
-      --------------
-      Coverage Amount: ${certificate.coverageAmount}
-      Issue Date: ${certificate.issueDate}
-      Expiry Date: ${certificate.expiryDate}
-      Status: ${certificate.status}
-      
-      Documents Verified:
-      -------------------
-      Address Proof: ${certificate.documents?.addressProof || "Verified"}
-      ID Proof: ${certificate.documents?.idProof || "Verified"}
-      Pathology Report: ${certificate.documents?.pathologyReport || "Verified"}
-      Doctor Prescription: ${certificate.documents?.doctorPrescription || "Verified"}
-      Biometric Verification: ✓ Complete
-      Nominee Biometric: ✓ Complete
-      
-      ================================================
-      This certificate is digitally signed and valid for insurance claims.
-      To claim insurance, please submit this certificate along with biometric verification.
-      ================================================
-    `;
+  const handleDownload = async () => {
+    if (token && certificate?.claimId) {
+      try {
+        const { blob, filename } = await api.downloadCertificate(
+          token,
+          certificate.claimId,
+        );
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        return;
+      } catch (error) {
+        alert(error.message || "Failed to download certificate PDF");
+        return;
+      }
+    }
 
-    // Create blob and download
-    const blob = new Blob([certificateContent], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `Insurance_Certificate_${certificate.certificateId}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-
-    alert("✅ Certificate downloaded successfully!");
+    window.print();
   };
 
   const handlePrint = () => {
