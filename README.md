@@ -193,7 +193,6 @@ http://localhost:3000
 
 **Ambapali Datta**
 BTech Information Technology Student
-Full-Stack Development Enthusiast
 
 ---
 
