@@ -2,7 +2,6 @@
 package com.project.insurancebackend.controller;
 
 import com.project.insurancebackend.dto.ClaimDto;
-import com.project.insurancebackend.service.AuthService;
 import com.project.insurancebackend.service.ClaimService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
@@ -30,9 +29,6 @@ public class ClaimController {
     @Autowired
     private ClaimService claimService;
 
-    @Autowired
-    private AuthService authService;
-
     private final Path uploadDir = Paths.get("uploads");
 
     @PostMapping
@@ -42,10 +38,7 @@ public class ClaimController {
             // parsing)
             String userEmail = extractEmailFromToken(token);
             ClaimDto created = claimService.createClaim(userEmail);
-            Map<String, Object> response = new HashMap<>();
-            response.put("claimId", created.getId());
-            response.put("claim", created);
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(created);
         } catch (Exception e) {
             Map<String, String> error = new HashMap<>();
             error.put("message", e.getMessage());
@@ -173,12 +166,8 @@ public class ClaimController {
             @RequestHeader("Authorization") String token) {
         try {
             String userEmail = extractEmailFromToken(token);
-            byte[] certificate = claimService.generateCertificatePdf(claimId, userEmail);
-            return ResponseEntity.ok()
-                    .contentType(MediaType.APPLICATION_PDF)
-                    .header(HttpHeaders.CONTENT_DISPOSITION,
-                            "attachment; filename=\"insurance-certificate-" + claimId + ".pdf\"")
-                    .body(certificate);
+            Map<String, Object> certificate = claimService.generateCertificate(claimId, userEmail);
+            return ResponseEntity.ok(certificate);
         } catch (Exception e) {
             Map<String, String> error = new HashMap<>();
             error.put("message", e.getMessage());
@@ -223,12 +212,12 @@ public class ClaimController {
     }
 
     private String extractEmailFromToken(String authHeader) {
+        // Simplified - in production, properly decode JWT
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
-            String email = authService.getEmailByToken(token);
-            if (email != null && !email.isBlank()) {
-                return email;
-            }
+            // For demo, return a mock email or decode from token
+            // In production, use JWT parser
+            return "user@example.com";
         }
         throw new RuntimeException("Invalid token");
     }

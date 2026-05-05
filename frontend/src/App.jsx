@@ -7,6 +7,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import Claims from "./pages/Claims";
+import ClaimForm from "./pages/ClaimForm";
 import Profile from "./pages/Profile";
 import VerifyOTP from "./pages/VerifyOTP";
 import PrivateRoute from "./components/PrivateRoute";
@@ -20,9 +21,6 @@ import DocumentUpload from "./pages/DocumentUpload";
 import VerifyClaims from "./pages/VerifyClaims";
 import BiometricVerification from "./pages/BiometricVerification";
 import InsuranceCertificate from "./pages/InsuranceCertificate";
-import UploadDocuments from "./pages/UploadDocuments";
-import SubmitClaim from "./pages/SubmitClaim";
-import Certificate from "./pages/Certificate";
 
 function App() {
   return (
@@ -57,7 +55,7 @@ function App() {
               path="/claims/new"
               element={
                 <PrivateRoute>
-                  <UploadDocuments />
+                  <ClaimForm />
                 </PrivateRoute>
               }
             />
@@ -114,30 +112,6 @@ function App() {
               element={
                 <PrivateRoute>
                   <BiometricVerification />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/biometric-verification/:claimId"
-              element={
-                <PrivateRoute>
-                  <BiometricVerification />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/submit-claim/:claimId"
-              element={
-                <PrivateRoute>
-                  <SubmitClaim />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/certificate/:claimId"
-              element={
-                <PrivateRoute>
-                  <Certificate />
                 </PrivateRoute>
               }
             />

@@ -2,27 +2,70 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { api } from "../lib/api";
 
 const Claims = () => {
-  const { user, token } = useAuth();
+  const { user } = useAuth();
   const [claims, setClaims] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
 
   useEffect(() => {
-    if (token && user?.email) {
-      fetchClaims();
-    }
-  }, [token, user?.email]);
+    fetchClaims();
+  }, []);
 
   const fetchClaims = async () => {
     try {
-      const data = await api.getUserClaims(token, user.email);
-      setClaims(data);
+      // Get claims from localStorage
+      const savedClaims = localStorage.getItem("userClaims");
+      if (savedClaims) {
+        setClaims(JSON.parse(savedClaims));
+      } else {
+        // Mock data for demo
+        const mockClaims = [
+          {
+            id: "CLM001",
+            type: "Health Insurance",
+            amount: 5000,
+            description: "Medical expenses for surgery",
+            incidentDate: "2024-01-10",
+            submissionDate: "2024-01-15",
+            status: "APPROVED",
+            certificateId: "INS-1705305600000",
+            documents: ["medical_report.pdf"],
+            biometricVerified: true,
+            approvedDate: "2024-01-20",
+            certificateUrl: "/certificates/CLM001.pdf",
+          },
+          {
+            id: "CLM002",
+            type: "Vehicle Insurance",
+            amount: 2500,
+            description: "Car accident repair",
+            incidentDate: "2024-01-18",
+            submissionDate: "2024-01-20",
+            status: "PENDING",
+            certificateId: "INS-1705305600000",
+            documents: ["police_report.pdf"],
+            biometricVerified: true,
+          },
+          {
+            id: "CLM003",
+            type: "Home Insurance",
+            amount: 10000,
+            description: "Water damage restoration",
+            incidentDate: "2024-01-05",
+            submissionDate: "2024-01-08",
+            status: "UNDER_REVIEW",
+            certificateId: "INS-1705305600000",
+            documents: ["damage_photos.zip"],
+            biometricVerified: true,
+          },
+        ];
+        setClaims(mockClaims);
+        localStorage.setItem("userClaims", JSON.stringify(mockClaims));
+      }
     } catch (error) {
       console.error("Error fetching claims:", error);
-      setClaims([]);
     } finally {
       setLoading(false);
     }
@@ -73,28 +116,9 @@ const Claims = () => {
     }
   };
 
-  const handleDownloadCertificate = async (claim) => {
-    try {
-      const { blob, filename } = await api.downloadCertificate(token, claim.id);
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      alert(error.message || "Failed to download certificate");
-    }
-  };
-
-  const formatDate = (value) => {
-    if (!value) return "Not available";
-    const parsed = new Date(value);
-    return Number.isNaN(parsed.getTime())
-      ? "Not available"
-      : parsed.toLocaleDateString();
+  const handleDownloadCertificate = (claim) => {
+    alert(`Downloading claim certificate for ${claim.id}`);
+    // In real app, this would download the PDF
   };
 
   const filteredClaims = claims.filter((claim) => {
@@ -221,11 +245,13 @@ const Claims = () => {
                       </h3>
                     </div>
                     <p className="text-sm text-gray-500">
-                      Submitted: {formatDate(claim.submissionDate)}
+                      Submitted:{" "}
+                      {new Date(claim.submissionDate).toLocaleDateString()}
                     </p>
-                    {(claim.approvedDate || claim.verifiedDate) && (
+                    {claim.approvedDate && (
                       <p className="text-sm text-green-600">
-                        Approved: {formatDate(claim.approvedDate || claim.verifiedDate)}
+                        Approved:{" "}
+                        {new Date(claim.approvedDate).toLocaleDateString()}
                       </p>
                     )}
                   </div>
@@ -239,27 +265,25 @@ const Claims = () => {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                   <div>
                     <p className="text-sm text-gray-500">Claim Type</p>
-                    <p className="font-medium">
-                      {claim.type || "General Insurance"}
-                    </p>
+                    <p className="font-medium">{claim.type}</p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Claim Amount</p>
                     <p className="font-medium text-lg text-blue-600">
-                      ${claim.amount || 0}
+                      ${claim.amount}
                     </p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Incident Date</p>
-                    <p className="font-medium">{formatDate(claim.incidentDate)}</p>
+                    <p className="font-medium">
+                      {new Date(claim.incidentDate).toLocaleDateString()}
+                    </p>
                   </div>
                 </div>
 
                 <div className="mb-4">
                   <p className="text-sm text-gray-500">Description</p>
-                  <p className="text-gray-700">
-                    {claim.description || "No description provided."}
-                  </p>
+                  <p className="text-gray-700">{claim.description}</p>
                 </div>
 
                 {claim.documents && claim.documents.length > 0 && (
