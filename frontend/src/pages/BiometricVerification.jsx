@@ -1,11 +1,12 @@
 // frontend/src/pages/BiometricVerification.jsx
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 const BiometricVerification = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { claimId } = useParams();
 
   const [step, setStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
@@ -236,15 +237,34 @@ const BiometricVerification = () => {
       // Simulate API calls
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
-      // Navigate to certificate page on success
-      navigate("/certificate", {
-        state: {
-          nomineeName: verificationData.nomineeName,
-          nomineeRelation: verificationData.nomineeRelation,
-          userMatchScore: verificationData.userMatchScore,
-          nomineeMatchScore: verificationData.nomineeMatchScore,
-        },
-      });
+      if (claimId) {
+        navigate(`/submit-claim/${claimId}`);
+      } else {
+        navigate("/insurance-certificate", {
+          state: {
+            certificate: {
+              claimId: null,
+              certificateId: `CERT-${Date.now()}`,
+              policyNumber: `POL-${Date.now().toString().slice(-6)}`,
+              holderName: user?.name,
+              holderEmail: user?.email,
+              holderPhone: user?.phone,
+              nomineeName: verificationData.nomineeName,
+              nomineeRelation: verificationData.nomineeRelation,
+              coverageAmount: "$50,000",
+              issueDate: new Date().toLocaleDateString(),
+              expiryDate: new Date(
+                new Date().setFullYear(new Date().getFullYear() + 1),
+              ).toLocaleDateString(),
+              status: "ACTIVE",
+              biometricData: {
+                user: { enrolled: true, verified: true },
+                nominee: { enrolled: true, verified: true },
+              },
+            },
+          },
+        });
+      }
     } catch (err) {
       setError(err.message);
     } finally {

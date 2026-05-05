@@ -6,19 +6,34 @@ import { api } from "../lib/api";
 export default function Certificate() {
   const { claimId } = useParams();
   const token = localStorage.getItem("token");
-  const [cert, setCert] = useState(null);
   const [err, setErr] = useState("");
+  const [downloading, setDownloading] = useState(false);
 
   useEffect(() => {
-    (async () => {
-      try {
-        const data = await api.getCertificate(token, claimId);
-        setCert(data);
-      } catch (ex) {
-        setErr(ex.message);
-      }
-    })();
-  }, [token, claimId]);
+    if (!token) {
+      setErr("Please log in to view your certificate.");
+    }
+  }, [token]);
+
+  async function handleDownload() {
+    try {
+      setDownloading(true);
+      setErr("");
+      const { blob, filename } = await api.downloadCertificate(token, claimId);
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (ex) {
+      setErr(ex.message);
+    } finally {
+      setDownloading(false);
+    }
+  }
 
   return (
     <div className="min-h-screen p-6 max-w-4xl mx-auto space-y-6">
@@ -41,7 +56,7 @@ export default function Certificate() {
             Return to Dashboard
           </Link>
         </Card>
-      ) : cert ? (
+      ) : (
         <>
           <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-500 rounded-2xl shadow-lg p-8">
             <div className="text-center space-y-6">
@@ -58,22 +73,16 @@ export default function Certificate() {
                 <div className="flex justify-between items-center border-b pb-3">
                   <span className="text-gray-600 font-semibold">Claim ID:</span>
                   <span className="font-mono text-lg text-gray-900">
-                    {cert.claimId}
+                    {claimId}
                   </span>
                 </div>
                 <div className="flex justify-between items-center border-b pb-3">
                   <span className="text-gray-600 font-semibold">Status:</span>
                   <span className="inline-block bg-green-100 text-green-800 px-3 py-1 rounded-full font-semibold">
-                    {cert.status}
+                    APPROVED
                   </span>
                 </div>
                 <div className="flex justify-between items-center border-b pb-3">
-                  <span className="text-gray-600 font-semibold">
-                    User Email:
-                  </span>
-                  <span className="text-gray-900">{cert.userEmail}</span>
-                </div>
-                <div className="flex justify-between items-center">
                   <span className="text-gray-600 font-semibold">
                     Certificate:
                   </span>
@@ -173,6 +182,14 @@ export default function Certificate() {
           </Card>
 
           <div className="flex flex-col sm:flex-row gap-4">
+            <button
+              type="button"
+              onClick={handleDownload}
+              disabled={downloading}
+              className="flex-1 px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-700 text-white font-semibold rounded-xl text-center hover:shadow-lg transition-all disabled:opacity-60"
+            >
+              {downloading ? "Preparing PDF..." : "Download PDF Certificate"}
+            </button>
             <Link
               to="/dashboard"
               className="flex-1 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-xl text-center hover:shadow-lg transition-all"
@@ -198,10 +215,6 @@ export default function Certificate() {
             </p>
           </div>
         </>
-      ) : (
-        <Card title="Loading">
-          <p>Loading certificate...</p>
-        </Card>
       )}
     </div>
   );
