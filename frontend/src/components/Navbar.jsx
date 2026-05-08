@@ -71,6 +71,12 @@ const Navbar = () => {
           break;
         case "USER":
           links.push({
+            path: "/insurance/purchase",
+            label: "Buy Insurance",
+            icon: "🛡️",
+            showAlways: true,
+          });
+          links.push({
             path: "/claims",
             label: "My Claims",
             icon: "📋",

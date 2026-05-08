@@ -11,6 +11,7 @@ import {
   ArrowRight,
   TrendingUp,
   Award,
+  CreditCard,
 } from "lucide-react";
 
 const Home = () => {
@@ -49,6 +50,12 @@ const Home = () => {
       title: "24/7 Support",
       description: "Dedicated support team to assist you anytime",
     },
+    {
+      icon: CreditCard,
+      title: "Buy Policies Online",
+      description:
+        "Choose a plan, assign a nominee, and activate coverage in one flow",
+    },
   ];
 
   const stats = [
@@ -79,13 +86,21 @@ const Home = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               {isAuthenticated ? (
-                <Link
-                  to="/dashboard"
-                  className="inline-flex items-center px-8 py-3 bg-white text-blue-600 rounded-lg font-semibold hover:shadow-xl transform hover:scale-105 transition-all duration-200"
-                >
-                  Go to Dashboard
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
+                <>
+                  <Link
+                    to="/dashboard"
+                    className="inline-flex items-center px-8 py-3 bg-white text-blue-600 rounded-lg font-semibold hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+                  >
+                    Go to Dashboard
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Link>
+                  <Link
+                    to="/insurance/purchase"
+                    className="inline-flex items-center px-8 py-3 bg-transparent border-2 border-white text-white rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-all duration-200"
+                  >
+                    Buy Insurance
+                  </Link>
+                </>
               ) : (
                 <>
                   <Link

@@ -63,6 +63,29 @@ export const api = {
       body: JSON.stringify({ email, password }),
     }),
 
+  getPolicyPlans: () =>
+    request("/api/policies/plans", {
+      method: "GET",
+    }),
+
+  getMyPolicies: (token) =>
+    request("/api/policies/my", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }),
+
+  purchasePolicy: (token, payload) =>
+    request("/api/policies/purchase", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    }),
+
   createClaim: (token) =>
     request("/api/claims", {
       method: "POST",
