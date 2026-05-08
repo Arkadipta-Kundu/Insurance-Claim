@@ -192,8 +192,7 @@ http://localhost:3000
 ## 👩‍💻 Author
 
 **Ambapali Datta**
-BTech Computer Science Student
-Full-Stack Development Enthusiast
+BTech Information Technology Student
 
 ---
 

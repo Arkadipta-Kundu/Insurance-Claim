@@ -29,11 +29,6 @@ async function request(path, options = {}) {
   return data;
 }
 
-function getFilenameFromDisposition(disposition, fallback) {
-  const match = disposition?.match(/filename="?([^"]+)"?/i);
-  return match?.[1] || fallback;
-}
-
 export const api = {
   sendOtp: (email) =>
     request("/api/auth/send-otp", {
@@ -95,14 +90,6 @@ export const api = {
       },
     }),
 
-  getUserClaims: (token, userEmail) =>
-    request(`/api/claims/user/${encodeURIComponent(userEmail)}`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }),
-
   uploadDoc: async (token, claimId, docType, file) => {
     const fd = new FormData();
     fd.append("file", file);
@@ -161,32 +148,11 @@ export const api = {
       headers: { Authorization: `Bearer ${token}` },
     }),
 
-  downloadCertificate: async (token, claimId) => {
-    const res = await fetch(`${BASE}/api/claims/${claimId}/certificate`, {
+  getCertificate: (token, claimId) =>
+    request(`/api/claims/${claimId}/certificate`, {
       method: "GET",
       headers: { Authorization: `Bearer ${token}` },
-    });
-
-    if (!res.ok) {
-      let message = "Certificate download failed";
-      try {
-        const data = await res.json();
-        message = data?.message || message;
-      } catch {
-        const text = await res.text();
-        message = text || message;
-      }
-      throw new Error(message);
-    }
-
-    const blob = await res.blob();
-    const filename = getFilenameFromDisposition(
-      res.headers.get("content-disposition"),
-      `insurance-certificate-${claimId}.pdf`,
-    );
-
-    return { blob, filename };
-  },
+    }),
 
   processImages: (token, claimId) =>
     request(`/api/claims/${claimId}/process-images`, {

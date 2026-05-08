@@ -3,18 +3,11 @@ package com.project.insurancebackend.service;
 
 import com.project.insurancebackend.dto.ClaimDto;
 import com.project.insurancebackend.dto.UserDto;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.pdmodel.PDPageContentStream;
-import org.apache.pdfbox.pdmodel.common.PDRectangle;
-import org.apache.pdfbox.pdmodel.font.PDFont;
-import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -239,9 +232,7 @@ public class ClaimService {
             throw new RuntimeException("All required documents must be uploaded");
         }
 
-        claim.setStatus("APPROVED");
-        claim.setVerifiedDate(new Date());
-        claim.setCertificateUrl("/api/claims/" + claimId + "/certificate");
+        claim.setStatus("PENDING");
         return claim;
     }
 
@@ -264,94 +255,13 @@ public class ClaimService {
         certificate.put("issueDate", new Date().toString());
         certificate.put("certificateId", "CERT-" + claimId);
         certificate.put("coverageAmount", claim.getAmount() > 0 ? claim.getAmount() : 50000);
-        certificate.put("policyNumber", "POL-" + claimId.replace("CLM-", ""));
+        certificate.put("policyNumber", "POL-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
         certificate.put("holderName", user.getName());
         certificate.put("holderEmail", user.getEmail());
         certificate.put("holderPhone", user.getPhone());
         certificate.put("documents", claimDocuments.get(claimId));
 
         return certificate;
-    }
-
-    public byte[] generateCertificatePdf(String claimId, String userEmail) {
-        ClaimDto claim = claims.get(claimId);
-        if (claim == null) {
-            throw new RuntimeException("Claim not found");
-        }
-
-        Map<String, Object> certificate = generateCertificate(claimId, userEmail);
-
-        try (PDDocument document = new PDDocument();
-                ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-            PDPage page = new PDPage(PDRectangle.A4);
-            document.addPage(page);
-
-            PDFont regularFont = new org.apache.pdfbox.pdmodel.font.PDType1Font(Standard14Fonts.FontName.HELVETICA);
-            PDFont boldFont = new org.apache.pdfbox.pdmodel.font.PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD);
-            PDFont italicFont = new org.apache.pdfbox.pdmodel.font.PDType1Font(Standard14Fonts.FontName.HELVETICA_OBLIQUE);
-
-            try (PDPageContentStream contentStream = new PDPageContentStream(document, page)) {
-                float margin = 50f;
-                float y = page.getMediaBox().getHeight() - margin;
-                float leading = 18f;
-
-                contentStream.beginText();
-                contentStream.setLeading(leading);
-                contentStream.newLineAtOffset(margin, y);
-
-                writeLine(contentStream, boldFont, 20, "Insurance Claim Certificate");
-                contentStream.newLine();
-                writeLine(contentStream, regularFont, 12,
-                        "This document confirms the claim and policy details recorded in the system.");
-                contentStream.newLine();
-                contentStream.newLine();
-
-                writeLine(contentStream, boldFont, 12, "Certificate ID: " + certificate.get("certificateId"));
-                writeLine(contentStream, regularFont, 12, "Claim ID: " + certificate.get("claimId"));
-                writeLine(contentStream, regularFont, 12, "Status: " + certificate.get("status"));
-                writeLine(contentStream, regularFont, 12, "Issue Date: " + certificate.get("issueDate"));
-                writeLine(contentStream, regularFont, 12, "Policy Number: " + certificate.get("policyNumber"));
-                contentStream.newLine();
-
-                writeLine(contentStream, boldFont, 12, "Policy Holder");
-                writeLine(contentStream, regularFont, 12,
-                        "Name: " + valueOrDefault(certificate.get("holderName"), "N/A"));
-                writeLine(contentStream, regularFont, 12,
-                        "Email: " + valueOrDefault(certificate.get("holderEmail"), "N/A"));
-                writeLine(contentStream, regularFont, 12,
-                        "Phone: " + valueOrDefault(certificate.get("holderPhone"), "N/A"));
-                contentStream.newLine();
-
-                writeLine(contentStream, boldFont, 12, "Claim Summary");
-                writeLine(contentStream, regularFont, 12,
-                        "Coverage Amount: $" + certificate.get("coverageAmount"));
-                writeLine(contentStream, regularFont, 12,
-                        "Claim Type: " + valueOrDefault(claim.getType(), "General Insurance"));
-                writeLine(contentStream, regularFont, 12,
-                        "Description: " + valueOrDefault(claim.getDescription(), "No description provided"));
-                contentStream.newLine();
-
-                writeLine(contentStream, boldFont, 12, "Uploaded Documents");
-                Map<String, String> documents = claimDocuments.getOrDefault(claimId, Collections.emptyMap());
-                if (documents.isEmpty()) {
-                    writeLine(contentStream, regularFont, 12, "No documents recorded.");
-                } else {
-                    for (Map.Entry<String, String> entry : documents.entrySet()) {
-                        writeLine(contentStream, regularFont, 12,
-                                "- " + entry.getKey() + ": " + entry.getValue());
-                    }
-                }
-                contentStream.newLine();
-                writeLine(contentStream, italicFont, 11,
-                        "Digitally generated by the Insurance Claim Verification System.");
-                contentStream.endText();
-            }
-
-            document.save(outputStream);
-            return outputStream.toByteArray();
-        } catch (IOException ex) {
-            throw new RuntimeException("Failed to generate certificate PDF", ex);
-        }
     }
 
     public ClaimDto getClaim(String claimId) {
@@ -397,21 +307,5 @@ public class ClaimService {
         return claims.values().stream()
                 .filter(claim -> insuranceCompanyId.equals(claim.getInsuranceCompanyId()))
                 .collect(Collectors.toList());
-    }
-
-    private void writeLine(PDPageContentStream contentStream, PDFont font, float fontSize, String text)
-            throws IOException {
-        contentStream.setFont(font, fontSize);
-        contentStream.showText(text);
-        contentStream.newLine();
-    }
-
-    private String valueOrDefault(Object value, String fallback) {
-        if (value == null) {
-            return fallback;
-        }
-
-        String text = value.toString();
-        return text.isBlank() ? fallback : text;
     }
 }

@@ -20,7 +20,6 @@ public class AuthService {
     private Map<String, UserDto> users = new ConcurrentHashMap<>();
     private Map<String, String> otpStore = new ConcurrentHashMap<>();
     private Map<String, String> tempUsers = new ConcurrentHashMap<>();
-    private Map<String, String> tokenStore = new ConcurrentHashMap<>();
 
     // Initialize default admin user
     public AuthService() {
@@ -128,7 +127,6 @@ public class AuthService {
         }
 
         String token = UUID.randomUUID().toString();
-        tokenStore.put(token, user.getEmail());
         UserDto responseUser = new UserDto();
         responseUser.setId(user.getId());
         responseUser.setName(user.getName());
@@ -139,10 +137,6 @@ public class AuthService {
         responseUser.setCompanyName(user.getCompanyName());
 
         return new AuthResponse(token, responseUser);
-    }
-
-    public String getEmailByToken(String token) {
-        return tokenStore.get(token);
     }
 
     public List<UserDto> getAllUsers() {
